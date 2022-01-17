@@ -1,0 +1,8 @@
+[package]
+name = "unity-rust-testbed"
+version = "0.1.0"
+authors = ["Keijiro Takahashi <keijiro@gmail.com>"]
+
+[lib]
+name = "testbed"
+crate-type = ["cdylib"]
