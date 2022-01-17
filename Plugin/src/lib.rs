@@ -27,3 +27,8 @@ pub unsafe extern fn format_float(value: f32) -> *const c_char {
     FORMAT_FLOAT_BUFFER.copy_from_slice(bytes);
     FORMAT_FLOAT_BUFFER.as_ptr() as *const c_char
 }
+
+#[no_mangle]
+pub unsafe extern fn get_xor(a: bool, b: bool) -> bool {
+    a ^ b
+}

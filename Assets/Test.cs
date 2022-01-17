@@ -23,6 +23,12 @@ public sealed class Test : MonoBehaviour
     [DllImport(_dll)]
     static extern IntPtr format_float(float value);
 
+    [DllImport(_dll)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    static extern bool get_xor([MarshalAs(UnmanagedType.U1)] bool a,
+                               [MarshalAs(UnmanagedType.U1)] bool b);
+    
+
     void Start()
     {
         var str = "hi hi high ho hige";
@@ -36,5 +42,7 @@ public sealed class Test : MonoBehaviour
         Debug.Log(sb);
 
         Debug.Log(Marshal.PtrToStringAnsi(format_float(Mathf.PI)));
+
+        Debug.Log($"{get_xor(true, true)}, {get_xor(false, true)}");
     }
 }
