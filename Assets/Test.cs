@@ -18,23 +18,23 @@ public sealed class Test : MonoBehaviour
     static extern uint count_substring2(StringBuilder sb, string sub);
 
     [DllImport(_dll)]
-    static extern void modify_string(StringBuilder sb, int size);
+    static extern void set_string(StringBuilder sb, int size);
 
     [DllImport(_dll)]
     static extern IntPtr format_float(float value);
 
     void Start()
     {
-        Debug.Log(count_substring("hi hi high ho hige", "hi"));
+        var str = "hi hi high ho hige";
+        var sub = "hi";
 
-        var sb = new StringBuilder("hi hi high ho hige");
-        Debug.Log(count_substring2(sb, "hi"));
+        Debug.Log(count_substring(str, sub));
+        Debug.Log(count_substring2(new StringBuilder(str), sub));
 
-        var sb2 = new StringBuilder(256);
-        modify_string(sb2, sb2.Capacity + 1);
-        Debug.Log(sb2);
+        var sb = new StringBuilder(256);
+        set_string(sb, sb.Capacity + 1);
+        Debug.Log(sb);
 
-        var txt = Marshal.PtrToStringAnsi(format_float(Mathf.PI));
-        Debug.Log(txt);
+        Debug.Log(Marshal.PtrToStringAnsi(format_float(Mathf.PI)));
     }
 }

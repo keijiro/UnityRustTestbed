@@ -10,7 +10,7 @@ pub unsafe extern fn count_substring(str_ptr: *const c_char, sub_ptr: *const c_c
 }
 
 #[no_mangle]
-pub unsafe extern fn modify_string(pointer: *mut c_char, size: i32) {
+pub unsafe extern fn set_string(pointer: *mut c_char, size: i32) {
     let text = CString::new("Hi from Rust!").unwrap();
     let bytes = text.as_bytes_with_nul();
     let dest = std::slice::from_raw_parts_mut(pointer as *mut u8, size as usize);
