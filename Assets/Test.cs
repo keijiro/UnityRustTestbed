@@ -95,6 +95,29 @@ public sealed class Test : MonoBehaviour
     }
 
     //
+    // Heap object allocation (boxing)
+    //
+
+    [DllImport(_dll)]
+    static extern IntPtr create_boxed_data(uint value);
+
+    [DllImport(_dll)]
+    static extern uint get_boxed_data_value(IntPtr pointer);
+
+    [DllImport(_dll)]
+    static extern void release_boxed_data(IntPtr pointer);
+
+    static void RunHeapTest()
+    {
+        var data = create_boxed_data(0xdeadbeefu);
+
+        Debug.Log("Boxed data retrieval (should be DEADBEEF): " +
+                  $"{get_boxed_data_value(data):X}");
+
+        release_boxed_data(data);
+    }
+
+    //
     // String operations
     //
 
@@ -137,6 +160,7 @@ public sealed class Test : MonoBehaviour
     {
         RunBoolTest();
         RunStructTest();
+        RunHeapTest();
         RunStringTest();
     }
 }

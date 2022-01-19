@@ -7,7 +7,7 @@ use std::os::raw::c_char;
 //
 
 #[no_mangle]
-pub unsafe extern fn get_xor(a: bool, b: bool) -> bool {
+pub unsafe extern "C" fn get_xor(a: bool, b: bool) -> bool {
     a ^ b
 }
 
@@ -32,7 +32,7 @@ pub struct Data2 {
 }
 
 #[no_mangle]
-pub unsafe extern fn modify_struct_data1(src: *const Data1, dst: *mut Data1) {
+pub unsafe extern "C" fn modify_struct_data1(src: *const Data1, dst: *mut Data1) {
     (*dst).d8  = (*src).d8  + 1;
     (*dst).d16 = (*src).d16 + 1;
     (*dst).d32 = (*src).d32 + 1;
@@ -40,7 +40,7 @@ pub unsafe extern fn modify_struct_data1(src: *const Data1, dst: *mut Data1) {
 }
 
 #[no_mangle]
-pub unsafe extern fn modify_inplace_struct_data1(data: *mut Data1) {
+pub unsafe extern "C" fn modify_inplace_struct_data1(data: *mut Data1) {
     (*data).d8  += 1;
     (*data).d16 += 1;
     (*data).d32 += 1;
@@ -48,7 +48,7 @@ pub unsafe extern fn modify_inplace_struct_data1(data: *mut Data1) {
 }
 
 #[no_mangle]
-pub unsafe extern fn modify_struct_data2(src: *const Data2, dst: *mut Data2) {
+pub unsafe extern "C" fn modify_struct_data2(src: *const Data2, dst: *mut Data2) {
     (*dst).d1  = (*src).d1 ^ true;
     (*dst).d2  = (*src).d2 ^ true;
     (*dst).d32 = (*src).d32 + 1.0;
@@ -56,7 +56,7 @@ pub unsafe extern fn modify_struct_data2(src: *const Data2, dst: *mut Data2) {
 }
 
 #[no_mangle]
-pub unsafe extern fn modify_inplace_struct_data2(data: *mut Data2) {
+pub unsafe extern "C" fn modify_inplace_struct_data2(data: *mut Data2) {
     (*data).d1 ^= true;
     (*data).d2 ^= true;
     (*data).d32 += 1.0;
@@ -64,18 +64,40 @@ pub unsafe extern fn modify_inplace_struct_data2(data: *mut Data2) {
 }
 
 //
+// Heap object allocation (boxing)
+//
+
+pub struct Data3 { value: u32 }
+
+#[no_mangle]
+pub unsafe extern "C" fn create_boxed_data(value: u32) -> *mut Data3 {
+    let b = Box::new(Data3{ value: value });
+    Box::into_raw(b)
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn get_boxed_data_value(ptr: *const Data3) -> u32 {
+    (*ptr).value
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn release_boxed_data(ptr: *mut Data3) {
+    Box::from_raw(ptr);
+}
+
+//
 // String operations
 //
 
 #[no_mangle]
-pub unsafe extern fn count_substring(str_ptr: *const c_char, sub_ptr: *const c_char) -> u32 {
+pub unsafe extern "C" fn count_substring(str_ptr: *const c_char, sub_ptr: *const c_char) -> u32 {
     let string = CStr::from_ptr(str_ptr).to_str().unwrap();
     let substring = CStr::from_ptr(sub_ptr).to_str().unwrap();
     string.matches(substring).count() as u32
 }
 
 #[no_mangle]
-pub unsafe extern fn set_string(pointer: *mut c_char, size: i32) {
+pub unsafe extern "C" fn set_string(pointer: *mut c_char, size: i32) {
     let text = CString::new("Hi from Rust!").unwrap();
     let bytes = text.as_bytes_with_nul();
     let dest = std::slice::from_raw_parts_mut(pointer as *mut u8, size as usize);
@@ -85,7 +107,7 @@ pub unsafe extern fn set_string(pointer: *mut c_char, size: i32) {
 static mut FORMAT_FLOAT_BUFFER: Vec<u8> = vec![];
 
 #[no_mangle]
-pub unsafe extern fn format_float(value: f32) -> *const c_char {
+pub unsafe extern "C" fn format_float(value: f32) -> *const c_char {
     let text = CString::new(format!("{}", value)).unwrap();
     let bytes = text.as_bytes_with_nul();
     FORMAT_FLOAT_BUFFER.resize(bytes.len(), 0);
